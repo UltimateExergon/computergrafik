@@ -1,2 +1,2 @@
-# computergrafik
+# Computergrafik
 Projekt für Computergrafik
