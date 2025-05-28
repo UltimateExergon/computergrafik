@@ -42,5 +42,6 @@ void Model::loadModel(string file_name) {
 		file.close();
 
 		cout << "Geladene Facetten: " << modelData.size() << endl;
+		system("pause");
 	}
 }	
