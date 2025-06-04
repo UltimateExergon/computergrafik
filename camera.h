@@ -12,17 +12,25 @@ struct Pos2D {
 	float x, y;
 };
 
-class Camera{
-	public:
-		Pos3D cameraPos;
-		Pos3D cameraView;
-		Pos2D worldSize;
-		int imageWidth = 1000;
-		int imageHeight = 1000;
-		
-		Camera();
-		int get_imageHeight();
-		int get_imageWidth();
+class Camera {
+public:
+    Pos3D cameraPos;   
+    Pos3D cameraView;  
+	
+	// statt worldSize:
+    float screenWidth;  
+    float screenHeight;
+
+    int imageWidth; // jetzt im Konstruktor initialisiert
+    int imageHeight; // jetzt im Konstruktor initialisiert
+
+    Camera();
+    int get_imageHeight();
+    int get_imageWidth();
+	// wandelt Pixelkoordinaten in Weltkoordinaten um
+    Pos3D get_pixel(int x, int y) const;
 };
+
+
 
 #endif
