@@ -1,6 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 #include <vector>
+#include "ray.h"
 
 using namespace std;
 
@@ -29,6 +30,7 @@ public:
     int get_imageWidth();
 	// wandelt Pixelkoordinaten in Weltkoordinaten um
     Pos3D get_pixel(int x, int y) const;
+	Ray get_ray(int x, int y) const;
 };
 
 
