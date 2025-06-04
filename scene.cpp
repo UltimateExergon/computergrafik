@@ -35,7 +35,18 @@ void createPPM(){
 }
 
 int main() {
-	
+	// Test
+	Camera camera;
+    
+    Pos3D pixel1 = camera.get_pixel(0, 0);
+    Pos3D pixel2 = camera.get_pixel(500, 500);
+    Pos3D pixel3 = camera.get_pixel(999, 999);
+
+    std::cout << "Pixel (0,0) -> " << pixel1.x << ", " << pixel1.y << ", " << pixel1.z << std::endl;
+    std::cout << "Pixel (500,500) -> " << pixel2.x << ", " << pixel2.y << ", " << pixel2.z << std::endl;
+    std::cout << "Pixel (999,999) -> " << pixel3.x << ", " << pixel3.y << ", " << pixel3.z << std::endl;
+	// Test Ende
+
 	cout << "Hello World!" << endl;
 	
 	Model testmodel;
@@ -44,3 +55,4 @@ int main() {
 	
 	return 0;
 }
+
