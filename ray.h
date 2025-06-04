@@ -1,15 +1,15 @@
+#include "camera.h"
 #ifndef RAY_H
 #define RAY_H
-#include <vector>
 
-using namespace std;
 
 class Ray {
-	public:
-		vector<float> origin;
-		vector<float> direction;
-		
-		Ray();
+public:
+    Pos3D origin;
+    Pos3D direction;
+
+    Ray();
+    Ray(Pos3D origin, Pos3D direction);
 };
 
 #endif

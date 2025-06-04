@@ -1,4 +1,5 @@
 #include <cmath>
+#include "ray.h"
 #include "camera.h"
 
 Camera::Camera() {
@@ -39,5 +40,24 @@ Pos3D Camera::get_pixel(int x, int y) const {
 
     return pixelPos;
 }
+
+Ray Camera::get_ray(int x, int y) const {
+    Pos3D pixelPos = get_pixel(x, y);
+
+    Pos3D direction = { pixelPos.x - cameraPos.x, 
+                        pixelPos.y - cameraPos.y, 
+                        pixelPos.z - cameraPos.z };
+
+    float length = sqrt(direction.x * direction.x + 
+                        direction.y * direction.y + 
+                        direction.z * direction.z);
+
+    direction.x /= length;
+    direction.y /= length;
+    direction.z /= length;
+
+    return Ray(cameraPos, direction);
+}
+
 
 
