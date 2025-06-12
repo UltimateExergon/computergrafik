@@ -87,7 +87,7 @@ bool intersection(Facet triangle, Ray r){
 	Vertex c = vertex_pos_cross(edge2, r.direction);
 	
 	float det = vertex_dot(edge1, c);
-				
+			
 	float epsilon = 0.00001f;
 				
 	if (fabsf(det) < epsilon) {
@@ -115,7 +115,7 @@ bool intersection(Facet triangle, Ray r){
 	float t = vertex_dot(edge2, q) * inv_det;
 				
 	if (t > epsilon) {
-		return true;
+		return true; //return Vertex hit = pos_plus_vertex(r.origin, pos_times_float(r.direction, t))
 	}
 	else {
 		return false;
@@ -143,6 +143,7 @@ void createPPM(Camera cam, Model model){
 	//Add model data to ppm
 	for (int i = 0; i < cam.get_imageHeight(); i++){
 		for (int j = 0; j < cam.get_imageWidth(); j++){
+			
 			for (int l = 0; l < int(data.size()); l++){
 				Ray r = cam.get_ray(j, i);
 				Facet tri = data.at(l);
@@ -151,6 +152,7 @@ void createPPM(Camera cam, Model model){
 				
 				if (hit == true){
 					ppm_file << modelColor.r << ' ' << modelColor.g << ' ' << modelColor.b << endl;
+					break;
 				}
 				else {
 					ppm_file << backgroundColor.r << ' ' << backgroundColor.g << ' ' << backgroundColor.b << endl;
