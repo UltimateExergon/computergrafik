@@ -9,7 +9,7 @@ using namespace std;
 Model::Model(){}; //Constructor (empty atm)
 
 //Load Model file
-void Model::loadModel(string file_name) {
+vector<Facet> Model::loadModel(string file_name) {
 	ifstream file(file_name);
 	vector<Facet> modelData; 
 			
@@ -42,6 +42,7 @@ void Model::loadModel(string file_name) {
 		file.close();
 
 		cout << "Geladene Facetten: " << modelData.size() << endl;
-		system("pause");
 	}
+	
+	return modelData;
 }	

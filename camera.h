@@ -1,6 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 #include <vector>
+#include <limits>
+#include "model.h"
 
 using namespace std;
 
@@ -10,6 +12,24 @@ struct Pos3D {
 
 struct Pos2D {
 	float x, y;
+};
+
+class Ray {
+	public:
+		Pos3D origin;
+		Pos3D direction;
+
+		Ray();
+		Ray(Pos3D origin, Pos3D direction);
+};
+
+class Hitpoint{
+	public:
+		Pos3D position;
+		float distance = numeric_limits<float>::max();
+		const Model* model = nullptr;
+		
+		Hitpoint();
 };
 
 class Camera {
@@ -29,8 +49,7 @@ public:
     int get_imageWidth();
 	// wandelt Pixelkoordinaten in Weltkoordinaten um
     Pos3D get_pixel(int x, int y) const;
+    Ray get_ray(int x, int y) const;
 };
-
-
 
 #endif

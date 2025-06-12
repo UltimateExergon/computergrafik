@@ -18,7 +18,7 @@ struct Facet {
 class Model {
 	public:
 		Model(); //Constructor (empty atm)
-		void loadModel(string file_name);
+		vector<Facet> loadModel(string file_name);
 	private:
 		// speichert Liste von Facets in einem Vektor
 		vector<Facet> modelData;
