@@ -21,6 +21,7 @@ class Ray {
 
 		Ray();
 		Ray(Pos3D origin, Pos3D direction);
+		Pos3D normalize(Pos3D v1);
 };
 
 class Hitpoint{

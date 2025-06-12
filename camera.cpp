@@ -5,18 +5,18 @@
 using namespace std;
 
 Camera::Camera() {
-	cameraPos.x = 10;
-	cameraPos.y = 10;
-	cameraPos.z = 10;
+	cameraPos.x = 0.5;
+	cameraPos.y = -1;
+	cameraPos.z = 1;
 	
-	cameraView.x = 0;
-	cameraView.y = 0;
-	cameraView.z = 0;
+	cameraView.x = -0.5;
+	cameraView.y = 3;
+	cameraView.z = 0.5;
 	
     screenWidth = 2.0f;
     screenHeight = 2.0f;
-    imageWidth = 500; 
-    imageHeight = 500;
+    imageWidth = 200; 
+    imageHeight = 200;
 }
 
 
@@ -69,8 +69,19 @@ Ray Camera::get_ray(int x, int y) const {
     return Ray(cameraPos, direction);
 }
 
+Pos3D Ray::normalize(Pos3D v1){
+	Pos3D v2;
+	
+	float length = sqrt(v1.x * v1.x + v1.y * v1.y + v2.z * v2.z);
+	v2.x = v2.x / length;
+	v2.y = v2.y / length;
+	v2.z = v2.z / length;
+	
+	return v2;
+}
+
 Ray::Ray() : origin{0, 0, 0}, direction{0, 0, 0} {}
-Ray::Ray(Pos3D orig, Pos3D dir) : origin(orig), direction(dir) {}
+Ray::Ray(Pos3D orig, Pos3D dir) : origin(orig), direction(normalize(dir)) {}
 
 Hitpoint::Hitpoint(){};
 
