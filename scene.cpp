@@ -115,7 +115,7 @@ bool intersection(Facet triangle, Ray r){
 	float t = vertex_dot(edge2, q) * inv_det;
 				
 	if (t > epsilon) {
-		return true; //return Vertex hit = pos_plus_vertex(r.origin, pos_times_float(r.direction, t))
+		return true; //return Vertex hit = pos_plus_vertex(r.origin, pos_times_float(r.direction, t)) -> Position of Intersection -> Return Hitpoint later
 	}
 	else {
 		return false;
@@ -171,6 +171,19 @@ int main() {
 	
 	Model testmodel;
 	Camera camera;
+	
+	cout << "Enter Camera Position X: ";
+	cin >> camera.cameraPos.x;
+	cout << "Enter Camera Position Y: ";
+	cin >> camera.cameraPos.y;
+	cout << "Enter Camera Position Z: ";
+	cin >> camera.cameraPos.z;
+	cout << "Enter Camera View X: ";
+	cin >> camera.cameraView.x;
+	cout << "Enter Camera View Y: ";
+	cin >> camera.cameraView.y;
+	cout << "Enter Camera View Z: ";
+	cin >> camera.cameraView.z;
 	
 	createPPM(camera, testmodel);
 	

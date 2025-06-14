@@ -5,14 +5,6 @@
 using namespace std;
 
 Camera::Camera() {
-	cameraPos.x = 0.5;
-	cameraPos.y = -1;
-	cameraPos.z = 1;
-	
-	cameraView.x = -0.5;
-	cameraView.y = 3;
-	cameraView.z = 0.5;
-	
     screenWidth = 2.0f;
     screenHeight = 2.0f;
     imageWidth = 200; 
