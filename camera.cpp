@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iostream>
 #include "camera.h"
+#include "vector3d.h"
 
 using namespace std;
 
@@ -21,11 +22,12 @@ int Camera::get_imageHeight(){
 }
 
 
-Pos3D Camera::get_pixel(int x, int y) const {
+Vector3D Camera::get_pixel(int x, int y) const {
     // Berechne den Mittelpunkt des Bildschirms in Weltkoordinaten
-    Pos3D screenCenter = { cameraPos.x + cameraView.x, 
-                           cameraPos.y + cameraView.y, 
-                           cameraPos.z + cameraView.z };
+    Vector3D screenCenter;
+    screenCenter.x = cameraPos.x + cameraView.x;
+    screenCenter.y = cameraPos.y + cameraView.y; 
+    screenCenter.z = cameraPos.z + cameraView.z;
 
     // Berechne die Größe eines Pixels in Weltkoordinaten
     float pixelWidth = screenWidth / imageWidth;
@@ -36,19 +38,21 @@ Pos3D Camera::get_pixel(int x, int y) const {
     float offsetY = (y - imageHeight / 2.0f) * pixelHeight;
 
     // Berechne die endgültige Pixelposition
-    Pos3D pixelPos = { screenCenter.x + offsetX, 
-                       screenCenter.y + offsetY, 
-                       screenCenter.z };
+    Vector3D pixelPos;
+    pixelPos.x = screenCenter.x + offsetX;
+    pixelPos.y = screenCenter.y + offsetY; 
+    pixelPos.z = screenCenter.z;
 
     return pixelPos;
 }
 
 Ray Camera::get_ray(int x, int y) const {
-    Pos3D pixelPos = get_pixel(x, y);
+    Vector3D pixelPos = get_pixel(x, y);
 
-    Pos3D direction = { pixelPos.x - cameraPos.x, 
-                        pixelPos.y - cameraPos.y, 
-                        pixelPos.z - cameraPos.z };
+    Vector3D direction;
+    direction.x = pixelPos.x - cameraPos.x; 
+    direction.y = pixelPos.y - cameraPos.y; 
+    direction.z = pixelPos.z - cameraPos.z;
 
     float length = sqrt(direction.x * direction.x + 
                         direction.y * direction.y + 
@@ -61,8 +65,8 @@ Ray Camera::get_ray(int x, int y) const {
     return Ray(cameraPos, direction);
 }
 
-Pos3D Ray::normalize(Pos3D v1){
-	Pos3D v2;
+Vector3D Ray::normalize(Vector3D v1){
+	Vector3D v2;
 	
 	float length = sqrt(v1.x * v1.x + v1.y * v1.y + v2.z * v2.z);
 	v2.x = v2.x / length;
@@ -72,8 +76,18 @@ Pos3D Ray::normalize(Pos3D v1){
 	return v2;
 }
 
-Ray::Ray() : origin{0, 0, 0}, direction{0, 0, 0} {}
-Ray::Ray(Pos3D orig, Pos3D dir) : origin(orig), direction(normalize(dir)) {}
+Ray::Ray(){
+	origin.x = 0;
+	origin.y = 0;
+	origin.z = 0;
+	
+	direction.x = 0;
+	direction.y = 0;
+	direction.z = 0;
+}
+
+
+Ray::Ray(Vector3D orig, Vector3D dir) : origin(orig), direction(normalize(dir)) {}
 
 Hitpoint::Hitpoint(){};
 

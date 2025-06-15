@@ -2,17 +2,13 @@
 #define MODEL_H
 #include <string>
 #include <vector>
+#include "vector3d.h"
 
 using namespace std;
 
-// Vertex Koordinaten
-struct Vertex {
-	float x, y, z;
-};
-
 struct Facet {
-	Vertex normal; // Flächennormale
-	Vertex vertices[3]; // Eckpunkte Dreieck
+	Vector3D normal; // Flächennormale
+	Vector3D vertices[3]; // Eckpunkte Dreieck
 };
 
 class Model {
