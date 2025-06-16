@@ -6,10 +6,13 @@
 using namespace std;
 
 Camera::Camera() {
-    screenWidth = 2.0f;
-    screenHeight = 2.0f;
+    screenWidth = 10.0f;
+    screenHeight = 10.0f;
     imageWidth = 200; 
     imageHeight = 200;
+    
+	offsetX = 0.0f;
+	offsetY = 0.0f;
 }
 
 
@@ -22,20 +25,33 @@ int Camera::get_imageHeight(){
 }
 
 
-Vector3D Camera::get_pixel(int x, int y) const {
+Vector3D Camera::get_pixel(int x, int y) {
     // Berechne den Mittelpunkt des Bildschirms in Weltkoordinaten
     Vector3D screenCenter;
     screenCenter.x = cameraPos.x + cameraView.x;
     screenCenter.y = cameraPos.y + cameraView.y; 
     screenCenter.z = cameraPos.z + cameraView.z;
+	//screenCenter = cameraPos;
 
     // Berechne die Größe eines Pixels in Weltkoordinaten
     float pixelWidth = screenWidth / imageWidth;
     float pixelHeight = screenHeight / imageHeight;
-
-    // Berechne die Offset-Werte zur Position des Pixels relativ zur Mitte
-    float offsetX = (x - imageWidth / 2.0f) * pixelWidth;
-    float offsetY = (y - imageHeight / 2.0f) * pixelHeight;
+    
+	Vector3D upperLeftCorner;
+	upperLeftCorner.x = cameraPos.x - pixelWidth/2 - pixelHeight/2; 
+	upperLeftCorner.y = cameraPos.y - pixelWidth/2 - pixelHeight/2; 
+	upperLeftCorner.z = cameraPos.z - pixelWidth/2 - pixelHeight/2; 
+	
+	 // Berechne die Offset-Werte zur Position des Pixels relativ zur Mitte
+    offsetX = (x - imageWidth / 2.0f) * pixelWidth;
+    offsetY = (y - imageHeight / 2.0f) * pixelHeight;
+    
+    //offsetX = pixelWidth;
+    //offsetY = pixelHeight;
+	
+	//pixel00loc.x = upperLeftCorner.x + 0.5 * (offsetX + offsetY);
+	//pixel00loc.y = upperLeftCorner.y + 0.5 * (offsetX + offsetY);
+	//pixel00loc.z = upperLeftCorner.z + 0.5 * (offsetX + offsetY);
 
     // Berechne die endgültige Pixelposition
     Vector3D pixelPos;
@@ -46,10 +62,14 @@ Vector3D Camera::get_pixel(int x, int y) const {
     return pixelPos;
 }
 
-Ray Camera::get_ray(int x, int y) const {
+Ray Camera::get_ray(int x, int y) {
     Vector3D pixelPos = get_pixel(x, y);
 
     Vector3D direction;
+    //direction.x = pixel00loc.x + x + offsetX;
+    //direction.y = pixel00loc.y + y + offsetY;
+    //direction.z = pixel00loc.z;
+    
     direction.x = pixelPos.x - cameraPos.x; 
     direction.y = pixelPos.y - cameraPos.y; 
     direction.z = pixelPos.z - cameraPos.z;
@@ -87,7 +107,7 @@ Ray::Ray(){
 }
 
 
-Ray::Ray(Vector3D orig, Vector3D dir) : origin(orig), direction(normalize(dir)) {}
+Ray::Ray(Vector3D orig, Vector3D dir) : origin(orig), direction(dir) {}
 
 Hitpoint::Hitpoint(){};
 

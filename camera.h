@@ -27,14 +27,15 @@ class Hitpoint{
 		float distance = numeric_limits<float>::max();
 		bool has_hit;
 		const Model* model = nullptr;
+		int hit_reason;
 		
 		Hitpoint();
 };
 
 class Camera {
 public:
-    Vector3D cameraPos;   
-    Vector3D cameraView;  
+    Vector3D cameraPos;  //Position of Camera -> Location the Camera is looking from 
+    Vector3D cameraView; //The Point the Camera is looking at 
 	
 	// statt worldSize:
     float screenWidth;  
@@ -42,13 +43,17 @@ public:
 
     int imageWidth; // jetzt im Konstruktor initialisiert
     int imageHeight; // jetzt im Konstruktor initialisiert
+    
+    Vector3D pixel00loc;
+	float offsetX;
+	float offsetY;
 
     Camera();
     int get_imageHeight();
     int get_imageWidth();
 	// wandelt Pixelkoordinaten in Weltkoordinaten um
-    Vector3D get_pixel(int x, int y) const;
-    Ray get_ray(int x, int y) const;
+    Vector3D get_pixel(int x, int y);
+    Ray get_ray(int x, int y);
 };
 
 #endif

@@ -8,7 +8,7 @@ using namespace std;
 
 struct Facet {
 	Vector3D normal; // Flächennormale
-	Vector3D vertices[3]; // Eckpunkte Dreieck
+	vector<Vector3D> vertices; // Eckpunkte Dreieck
 };
 
 class Model {
