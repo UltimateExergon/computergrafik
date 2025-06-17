@@ -62,7 +62,7 @@ Vector3D vector_cross(Vector3D v1, Vector3D v2) {
 	return v3;
 }
 
-Hitpoint intersection(Facet triangle, Ray r){
+Hitpoint intersection(Facet triangle, Ray r, Camera cam){
 	//Möller-Trumbore Intersection Algorithm
 	Hitpoint hit;
 	Vector3D edge1;
@@ -74,7 +74,7 @@ Hitpoint intersection(Facet triangle, Ray r){
 	edge1.set_vector(vector_substraction(triangle.vertices[1], triangle.vertices[0]));
 	edge2.set_vector(vector_substraction(triangle.vertices[2], triangle.vertices[0]));
 				
-	c.set_vector(vector_cross(edge2, r.direction));
+	c.set_vector(vector_cross(edge2, cam.cameraView));
 	
 	float det = vector_dot(edge1, c);
 			
@@ -88,7 +88,7 @@ Hitpoint intersection(Facet triangle, Ray r){
 				
 	float inv_det = 1.0 / det;
 	
-	s.set_vector(vector_substraction(r.origin, triangle.vertices[0]));
+	s.set_vector(vector_substraction(cam.cameraPos, triangle.vertices[0]));
 	
 	float u = vector_dot(s, c) * inv_det;
 				
@@ -100,7 +100,7 @@ Hitpoint intersection(Facet triangle, Ray r){
 				
 	q.set_vector(vector_cross(s, edge1));
 				
-	float b = vector_dot(q, r.origin) * inv_det;
+	float b = vector_dot(q, cam.cameraPos) * inv_det;
 				
 	if (b < 0.0 || u + b > 1.0) {
 		hit.has_hit = false;
@@ -110,9 +110,9 @@ Hitpoint intersection(Facet triangle, Ray r){
 				
 	float t = vector_dot(edge2, q) * inv_det;
 				
-	if (t > epsilon) {
+	if (t < epsilon) {
 		hit.has_hit = true;
-		hit.position = vector_addition(r.origin, vector_times_float(r.direction, t));
+		hit.position = vector_addition(cam.cameraPos, vector_times_float(r.direction, t));
 		hit.hit_reason = 3;
 		return hit;
 	}
@@ -137,7 +137,7 @@ void createPPM(Camera cam, Model model){
 	Vector3D p2;
 	p2.set_values(3, 0, 0);
 	Vector3D p3;
-	p3.set_values(3, 3, 3);
+	p3.set_values(0, 0, 3);
 	
 	Vector3D n;
 	n.set_values(0, 1, 0);
@@ -152,7 +152,7 @@ void createPPM(Camera cam, Model model){
 	
 	int maxColors = 255;
 	
-	Color backgroundColor = {0, 0, 0}; //default schwarzer Hintergrund
+	Color backgroundColor = {255, 0, 0}; //default roter Hintergrund
 	Color modelColor = {255, 255, 255}; //default pinkes Model
 	
 	ofstream ppm_file("output.ppm");
@@ -179,7 +179,7 @@ void createPPM(Camera cam, Model model){
 				Facet tri = test_triangle;
 				
 				//Hitpoint hit = intersection(tri, r);
-				Hitpoint hit = intersection(test_triangle, r);
+				Hitpoint hit = intersection(test_triangle, r, cam);
 				
 				if (hit.has_hit == true){					
 					ppm_file << modelColor.r << ' ' << modelColor.g << ' ' << modelColor.b << endl;
@@ -205,7 +205,7 @@ void createPPM(Camera cam, Model model){
 							break;
 					}
 					
-					break;
+					continue;
 				}
 				else {
 					ppm_file << backgroundColor.r << ' ' << backgroundColor.g << ' ' << backgroundColor.b << endl;
