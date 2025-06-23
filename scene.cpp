@@ -127,7 +127,7 @@ Hitpoint intersection(Facet triangle, Ray r, Camera cam){
 
 //Creates a PPM output file
 void createPPM(Camera cam, Model model){
-	//vector<Facet> data = model.loadModel("model_cube.stl");
+	vector<Facet> data = model.loadModel("model_cube.stl");
 	
 	//TEST TRIANGLE----------------------
 	Facet test_triangle;

@@ -6,8 +6,8 @@
 using namespace std;
 
 Camera::Camera() {
-    screenWidth = 10.0f;
-    screenHeight = 10.0f;
+    screenWidth = 2.0f;
+    screenHeight = 2.0f;
     imageWidth = 200; 
     imageHeight = 200;
     
@@ -64,6 +64,8 @@ Vector3D Camera::get_pixel(int x, int y) {
 
 Ray Camera::get_ray(int x, int y) {
     Vector3D pixelPos = get_pixel(x, y);
+    
+    cout << pixelPos.x << ' ' << pixelPos.y << endl;
 
     Vector3D direction;
     //direction.x = pixel00loc.x + x + offsetX;

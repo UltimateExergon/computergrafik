@@ -28,7 +28,9 @@ vector<Facet> Model::loadModel(string file_name) {
 				iss >> word; 
 				iss >> facet.normal.x >> facet.normal.y >> facet.normal.z; // Werte extrahieren
 			} else if (word == "vertex") {
-				iss >> facet.vertices[vertexCount].x >> facet.vertices[vertexCount].y >> facet.vertices[vertexCount].z;
+				Vector3D vertex;
+				iss >> vertex.x >> vertex.y >> vertex.z;
+				facet.vertices.push_back(vertex);
 				vertexCount++;
 			}
 
