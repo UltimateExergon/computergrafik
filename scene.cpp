@@ -13,55 +13,6 @@ struct Color {
 	int r, g, b;
 };
 
-//Sum of two vectors
-Vector3D vector_addition(Vector3D v1, Vector3D v2) {
-	Vector3D v3;
-	
-	v3.x = v1.x + v2.x;
-	v3.y = v1.y + v2.y;
-	v3.z = v1.z + v2.z;
-	
-	return v3;
-}
-
-//Returns Subtraction of two Vertex
-Vector3D vector_substraction(Vector3D v1, Vector3D v2) {
-	Vector3D v3;
-	
-	v3.x = v1.x - v2.x;
-	v3.y = v1.y - v2.y;
-	v3.z = v1.z - v2.z;
-	
-	return v3;
-}
-
-//Multiply vector with a float
-Vector3D vector_times_float(Vector3D v1, float f) {
-	Vector3D v2;
-	
-	v2.x = v1.x * f;
-	v2.y = v1.y * f;
-	v2.z = v1.z * f;
-	
-	return v2;
-}
-
-//Returns dot product of two vectors
-float vector_dot(Vector3D v1, Vector3D v2){
-	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-}
-
-//Returns cross product of two vectors
-Vector3D vector_cross(Vector3D v1, Vector3D v2) {
-	Vector3D v3;
-	
-	v3.x = v1.y * v2.z - v1.z * v2.y;
-	v3.y = v1.z * v2.x - v1.x * v2.z;
-	v3.z = v1.x * v2.y - v1.y * v2.x;
-	
-	return v3;
-}
-
 Hitpoint intersection(Facet triangle, Ray r, Camera cam){
 	//Möller-Trumbore Intersection Algorithm
 	Hitpoint hit;
@@ -71,8 +22,8 @@ Hitpoint intersection(Facet triangle, Ray r, Camera cam){
 	Vector3D s;
 	Vector3D q;
 	
-	edge1.set_vector(vector_substraction(triangle.vertices[1], triangle.vertices[0]));
-	edge2.set_vector(vector_substraction(triangle.vertices[2], triangle.vertices[0]));
+	edge1.set_vector(vector_subtraction(triangle.vertices[1], triangle.vertices[0]));
+	edge2.set_vector(vector_subtraction(triangle.vertices[2], triangle.vertices[0]));
 				
 	c.set_vector(vector_cross(edge2, cam.cameraView));
 	
@@ -88,7 +39,7 @@ Hitpoint intersection(Facet triangle, Ray r, Camera cam){
 				
 	float inv_det = 1.0 / det;
 	
-	s.set_vector(vector_substraction(cam.cameraPos, triangle.vertices[0]));
+	s.set_vector(vector_subtraction(cam.cameraPos, triangle.vertices[0]));
 	
 	float u = vector_dot(s, c) * inv_det;
 				

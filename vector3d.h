@@ -11,4 +11,10 @@ class Vector3D {
 		void set_values(float X, float Y, float Z);
 };
 
+Vector3D vector_addition(Vector3D v1, Vector3D v2);
+Vector3D vector_subtraction(Vector3D v1, Vector3D v2);  
+Vector3D vector_times_float(Vector3D v1, float f);
+float vector_dot(Vector3D v1, Vector3D v2);
+Vector3D vector_cross(Vector3D v1, Vector3D v2);
+
 #endif
