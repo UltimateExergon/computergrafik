@@ -1,4 +1,5 @@
 #include "vector3d.h"
+#include "math.h"
 
 Vector3D::Vector3D(float X, float Y, float Z) : x(X), y(Y), z(Z) {};
 
@@ -61,4 +62,13 @@ Vector3D vector_cross(Vector3D v1, Vector3D v2) {
 	v3.z = v1.x * v2.y - v1.y * v2.x;
 	
 	return v3;
+}
+
+Vector3D vector_normalize(Vector3D v) {
+    float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (length == 0) return v;
+    v.x /= length;
+    v.y /= length;
+    v.z /= length;
+    return v;
 }
