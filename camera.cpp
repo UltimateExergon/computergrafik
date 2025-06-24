@@ -6,8 +6,8 @@
 using namespace std;
 
 Camera::Camera() {
-    screenWidth = 2.0f;
-    screenHeight = 2.0f;
+    screenWidth = 4.0f; // vorher: 2.0f
+    screenHeight = 4.0f; // vorher: 2.0f
     imageWidth = 200; 
     imageHeight = 200;
     
@@ -26,77 +26,58 @@ int Camera::get_imageHeight(){
 
 
 Vector3D Camera::get_pixel(int x, int y) {
-    // Berechne den Mittelpunkt des Bildschirms in Weltkoordinaten
-    Vector3D screenCenter;
-    screenCenter.x = cameraPos.x + cameraView.x;
-    screenCenter.y = cameraPos.y + cameraView.y; 
-    screenCenter.z = cameraPos.z + cameraView.z;
-	//screenCenter = cameraPos;
+    Vector3D forward = vector_normalize(cameraView);
+    Vector3D tmpUp(0, 0, 1);
 
-    // Berechne die Größe eines Pixels in Weltkoordinaten
+    if (fabs(vector_dot(forward, tmpUp)) > 0.999f) {
+        tmpUp = Vector3D(1, 0, 0);
+    }
+
+    Vector3D right = vector_normalize(vector_cross(tmpUp, forward));
+    Vector3D up = vector_cross(forward, right);
+
     float pixelWidth = screenWidth / imageWidth;
     float pixelHeight = screenHeight / imageHeight;
-    
-	Vector3D upperLeftCorner;
-	upperLeftCorner.x = cameraPos.x - pixelWidth/2 - pixelHeight/2; 
-	upperLeftCorner.y = cameraPos.y - pixelWidth/2 - pixelHeight/2; 
-	upperLeftCorner.z = cameraPos.z - pixelWidth/2 - pixelHeight/2; 
-	
-	 // Berechne die Offset-Werte zur Position des Pixels relativ zur Mitte
-    offsetX = (x - imageWidth / 2.0f) * pixelWidth;
-    offsetY = (y - imageHeight / 2.0f) * pixelHeight;
-    
-    //offsetX = pixelWidth;
-    //offsetY = pixelHeight;
-	
-	//pixel00loc.x = upperLeftCorner.x + 0.5 * (offsetX + offsetY);
-	//pixel00loc.y = upperLeftCorner.y + 0.5 * (offsetX + offsetY);
-	//pixel00loc.z = upperLeftCorner.z + 0.5 * (offsetX + offsetY);
 
-    // Berechne die endgültige Pixelposition
-    Vector3D pixelPos;
-    pixelPos.x = screenCenter.x + offsetX;
-    pixelPos.y = screenCenter.y + offsetY; 
-    pixelPos.z = screenCenter.z;
+    float sx = (x + 0.5f - imageWidth / 2.0f) * pixelWidth;
+    float sy = (y + 0.5f - imageHeight / 2.0f) * pixelHeight;
+
+    // Jetzt korrekt: Kamera schaut entlang 'forward', und Bildfläche liegt senkrecht dazu
+    Vector3D screenCenter = vector_addition(cameraPos, forward);
+
+    // Die Pixelposition liegt seitlich (right) und oben (up) versetzt vom screenCenter
+    Vector3D pixelPos = vector_addition(
+        vector_addition(screenCenter, vector_times_float(right, sx)),
+        vector_times_float(up, sy)
+    );
 
     return pixelPos;
 }
 
+
+
 Ray Camera::get_ray(int x, int y) {
     Vector3D pixelPos = get_pixel(x, y);
+    Vector3D dir = vector_subtraction(pixelPos, cameraPos);
     
-    cout << pixelPos.x << ' ' << pixelPos.y << endl;
+    float length = sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
+    dir.x /= length;
+    dir.y /= length;
+    dir.z /= length;
 
-    Vector3D direction;
-    //direction.x = pixel00loc.x + x + offsetX;
-    //direction.y = pixel00loc.y + y + offsetY;
-    //direction.z = pixel00loc.z;
-    
-    direction.x = pixelPos.x - cameraPos.x; 
-    direction.y = pixelPos.y - cameraPos.y; 
-    direction.z = pixelPos.z - cameraPos.z;
-
-    float length = sqrt(direction.x * direction.x + 
-                        direction.y * direction.y + 
-                        direction.z * direction.z);
-
-    direction.x /= length;
-    direction.y /= length;
-    direction.z /= length;
-
-    return Ray(cameraPos, direction);
+    return Ray(cameraPos, dir);
 }
 
-Vector3D Ray::normalize(Vector3D v1){
-	Vector3D v2;
-	
-	float length = sqrt(v1.x * v1.x + v1.y * v1.y + v2.z * v2.z);
-	v2.x = v2.x / length;
-	v2.y = v2.y / length;
-	v2.z = v2.z / length;
-	
-	return v2;
+
+Vector3D Ray::normalize(Vector3D v1) {
+    float length = sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z);  // v1.z statt v2.z
+    if (length == 0) return v1;
+    v1.x /= length;
+    v1.y /= length;
+    v1.z /= length;
+    return v1;
 }
+
 
 Ray::Ray(){
 	origin.x = 0;
