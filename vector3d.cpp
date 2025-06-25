@@ -64,11 +64,11 @@ Vector3D vector_cross(Vector3D v1, Vector3D v2) {
 	return v3;
 }
 
-Vector3D vector_normalize(Vector3D v) {
-    float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-    if (length == 0) return v;
-    v.x /= length;
-    v.y /= length;
-    v.z /= length;
-    return v;
+Vector3D normalize(Vector3D v1) {
+    float length = sqrt(pow(v1.x, 2) + pow(v1.y, 2) + pow(v1.z, 2));
+    if (length == 0) return v1;
+    v1.x /= length;
+    v1.y /= length;
+    v1.z /= length;
+    return v1;
 }

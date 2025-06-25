@@ -18,18 +18,18 @@ class Ray {
 
 		Ray();
 		Ray(Vector3D origin, Vector3D direction);
-		Vector3D normalize(Vector3D v1);
 };
 
 class Hitpoint{
 	public:
 		Vector3D position;
-		float distance = numeric_limits<float>::max();
-		bool has_hit;
-		const Model* model = nullptr;
+		float distance;
 		int hit_reason;
+		Color hit_color;
+		float hit_point;
 		
 		Hitpoint();
+		float calculate_distance(Vector3D v2);
 };
 
 class Camera {
@@ -44,7 +44,6 @@ public:
     int imageWidth; // jetzt im Konstruktor initialisiert
     int imageHeight; // jetzt im Konstruktor initialisiert
     
-    Vector3D pixel00loc;
 	float offsetX;
 	float offsetY;
 

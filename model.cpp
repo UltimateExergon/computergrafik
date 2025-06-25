@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <list>
 #include "model.h"
 
 using namespace std;
@@ -9,13 +10,13 @@ using namespace std;
 Model::Model(){}; //Constructor (empty atm)
 
 //Load Model file
-vector<Facet> Model::loadModel(string file_name) {
+vector<Facet> Model::loadModel(string file_name, string colorFile_name) {
 	ifstream file(file_name);
-	vector<Facet> modelData; 
+	Facet facet;
 			
 	if (file.is_open()) {
 		string line;
-		Facet facet;
+		//Facet facet;
 		int vertexCount = 0; // damit wird gezählt, wie viele "vertex"-Zeilen es waren, weil Dreiecke brauchen genau 3 Seiten (=Zeile)		
 		
 		while (getline(file, line)) {
@@ -37,14 +38,30 @@ vector<Facet> Model::loadModel(string file_name) {
 			// nach drei eingelesen "vertex"-Zeilen/ Seiten wird Facet abgespeichert
 			if (vertexCount == 3) {
 				modelData.push_back(facet);
+				facet.vertices.clear();
 				vertexCount = 0; // Reset 
 			}
 		}
 
 		file.close();
-
-		cout << "Geladene Facetten: " << modelData.size() << endl;
 	}
+	
+	ifstream c_file(colorFile_name);
+	
+	if (c_file.is_open()){
+		string c_line;
+		int lineCount = 0;
+		
+		while (getline(c_file, c_line)){
+			istringstream issc(c_line);
+			issc >> modelData[lineCount].vertexColor.r >> modelData[lineCount].vertexColor.g >> modelData[lineCount].vertexColor.b;
+			lineCount++;
+		}
+		
+		c_file.close();
+	}
+	
+	cout << "Geladene Facetten: " << modelData.size() << endl;
 	
 	return modelData;
 }	

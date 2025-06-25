@@ -1,15 +1,16 @@
 #include <cmath>
 #include <iostream>
+#include <cmath>
 #include "camera.h"
 #include "vector3d.h"
 
 using namespace std;
 
 Camera::Camera() {
-    screenWidth = 4.0f; // vorher: 2.0f
-    screenHeight = 4.0f; // vorher: 2.0f
-    imageWidth = 200; 
-    imageHeight = 200;
+    screenWidth = 4.0f;
+    screenHeight = 4.0f;
+    imageWidth = 400; 
+    imageHeight = 300;
     
 	offsetX = 0.0f;
 	offsetY = 0.0f;
@@ -26,14 +27,14 @@ int Camera::get_imageHeight(){
 
 
 Vector3D Camera::get_pixel(int x, int y) {
-    Vector3D forward = vector_normalize(cameraView);
+    Vector3D forward = normalize(cameraView);
     Vector3D tmpUp(0, 0, 1);
 
     if (fabs(vector_dot(forward, tmpUp)) > 0.999f) {
         tmpUp = Vector3D(1, 0, 0);
     }
 
-    Vector3D right = vector_normalize(vector_cross(tmpUp, forward));
+    Vector3D right = normalize(vector_cross(tmpUp, forward));
     Vector3D up = vector_cross(forward, right);
 
     float pixelWidth = screenWidth / imageWidth;
@@ -55,42 +56,25 @@ Vector3D Camera::get_pixel(int x, int y) {
 }
 
 
-
 Ray Camera::get_ray(int x, int y) {
     Vector3D pixelPos = get_pixel(x, y);
-    Vector3D dir = vector_subtraction(pixelPos, cameraPos);
+    Vector3D dir = normalize(vector_subtraction(pixelPos, cameraPos));
     
-    float length = sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
-    dir.x /= length;
-    dir.y /= length;
-    dir.z /= length;
-
     return Ray(cameraPos, dir);
 }
 
-
-Vector3D Ray::normalize(Vector3D v1) {
-    float length = sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z);  // v1.z statt v2.z
-    if (length == 0) return v1;
-    v1.x /= length;
-    v1.y /= length;
-    v1.z /= length;
-    return v1;
-}
-
-
 Ray::Ray(){
-	origin.x = 0;
-	origin.y = 0;
-	origin.z = 0;
-	
-	direction.x = 0;
-	direction.y = 0;
-	direction.z = 0;
 }
 
 
 Ray::Ray(Vector3D orig, Vector3D dir) : origin(orig), direction(dir) {}
 
-Hitpoint::Hitpoint(){};
+Hitpoint::Hitpoint(){
+	distance = numeric_limits<float>::max();
+	hit_color = {50, 50, 50}; //default Hintergrund;
+};
+
+float Hitpoint::calculate_distance(Vector3D v2){
+	return sqrt(pow((position.x - v2.x), 2) + pow((position.y - v2.y), 2) + pow((position.z - v2.z), 2));
+}
 

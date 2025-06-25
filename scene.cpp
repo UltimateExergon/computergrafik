@@ -9,11 +9,8 @@
 
 using namespace std;
 
-struct Color {
-	int r, g, b;
-};
-
-Hitpoint intersection(Facet triangle, Ray r, Camera cam){
+Hitpoint intersection(Facet triangle, Ray r){
+	//print_facet(triangle, "FACET INTERSECT: ");
     //Möller-Trumbore Intersection Algorithm
 	Hitpoint hit;
     Vector3D edge1;
@@ -25,50 +22,47 @@ Hitpoint intersection(Facet triangle, Ray r, Camera cam){
     edge1.set_vector(vector_subtraction(triangle.vertices[1], triangle.vertices[0]));
     edge2.set_vector(vector_subtraction(triangle.vertices[2], triangle.vertices[0]));
 
-    c.set_vector(vector_cross(edge2, r.direction));  // vorher: cam.cameraView
+    c.set_vector(vector_cross(edge2, r.direction));
 
-    float det = vector_dot(edge1, c);
+    float det = vector_dot(edge1, r.direction);
     
 	constexpr float epsilon = numeric_limits<float>::epsilon();
-
-    if (det > -epsilon && det < epsilon) {
-        hit.has_hit = false;
+	
+	 if (det > -epsilon && det < epsilon) {
         hit.hit_reason = 0;
         return hit; //Ray parallel to triangle or triangle is back-facing
     }
 
-    float inv_det = 1.0 / det;
+    float inv_det = 1.0f / det;
 
-    s.set_vector(vector_subtraction(r.origin, triangle.vertices[0]));  // vorher: cam.cameraPos
+    s.set_vector(vector_subtraction(r.origin, triangle.vertices[0]));
 
     float u = vector_dot(s, c) * inv_det;
 
-    if (u < 0.0 || u > 1.0) {
-        hit.has_hit = false;
+    if ((u < 0.0f && fabsf(u) > epsilon) || (u > 1.0f && fabsf(u - 1) > epsilon)) {
         hit.hit_reason = 1;
         return hit;
     }
 
     q.set_vector(vector_cross(s, edge1));
 
-    float b = vector_dot(q, r.direction) * inv_det;  // vorher: cam.cameraPos
+    float v = vector_dot(q, r.direction) * inv_det;
 
-    if (b < 0.0 || u + b > 1.0) {
-        hit.has_hit = false;
+    if ((v < 0.0f && fabsf(v) > epsilon) || (u + v > 1.0f && fabsf(u + v - 1) > epsilon)) {
         hit.hit_reason = 2;
         return hit;
     }
 
     float t = vector_dot(edge2, q) * inv_det;
 
-    if (t > epsilon) { // vorher: t < epsilon
-		hit.has_hit = true;
+    if (t > epsilon) {
 		hit.position = vector_addition(r.origin, vector_times_float(r.direction, t));
 		hit.hit_reason = 3;
-			return hit;
-		}
-		else {	
-		hit.has_hit = false;
+		hit.hit_color = triangle.vertexColor;
+		hit.hit_point = t;
+		return hit;
+	}
+	else {	
 		hit.hit_reason = 4;
 		return hit;
 	}
@@ -78,34 +72,31 @@ Hitpoint intersection(Facet triangle, Ray r, Camera cam){
 
 //Creates a PPM output file
 void createPPM(Camera cam, Model model){
-	vector<Facet> data = model.loadModel("model_cube.stl");
+	vector<Facet> data = model.loadModel("model_cube.stl", "colors.txt");
 	
 	//TEST TRIANGLE----------------------
-	Facet test_triangle;
+	//Facet test_triangle;
 	
-	Vector3D p1;
-	p1.set_values(0, 0, 0);
-	Vector3D p2;
-	p2.set_values(3, 0, 0);
-	Vector3D p3;
-	p3.set_values(0, 3, 3); // jetzt ist es schief im Raum
+	//Vector3D p1;
+	//p1.set_values(0, 0, 0);
+	//Vector3D p2;
+	//p2.set_values(3, 0, 0);
+	//Vector3D p3;
+	//p3.set_values(0, 3, 3); // jetzt ist es schief im Raum
 	
-	Vector3D n;
-	n.set_values(0, -1, 0); // zeigt nun nach unten zur Kamera hin
-	test_triangle.normal = n;
+	//Vector3D n;
+	//n.set_values(0, -1, 0); // zeigt nun nach unten zur Kamera hin
+	//test_triangle.normal = n;
 	
 	
-	test_triangle.vertices.push_back(p1);
-	test_triangle.vertices.push_back(p3);
-	test_triangle.vertices.push_back(p2);
+	//test_triangle.vertices.push_back(p1);
+	//test_triangle.vertices.push_back(p3);
+	//test_triangle.vertices.push_back(p2);
 
 	
 	//------------------------------------
 	
 	int maxColors = 255;
-	
-	Color backgroundColor = {255, 0, 0}; //default roter Hintergrund
-	Color modelColor = {255, 255, 255}; //default pinkes Model
 	
 	ofstream ppm_file("output.ppm");
 	
@@ -125,72 +116,49 @@ void createPPM(Camera cam, Model model){
 	//Add model data to ppm
 	for (int i = 0; i < cam.get_imageHeight(); i++){
 		for (int j = 0; j < cam.get_imageWidth(); j++){
-			//for (int l = 0; l < int(data.size()); l++){
-				Ray r = cam.get_ray(j, i);
-
-				// Debug-Ausgabe
-				if (i % 50 == 0 && j % 50 == 0) {
-					cout << "Pixel (" << j << "," << i << ") -> "
-						<< "Ray origin: (" << r.origin.x << ", " << r.origin.y << ", " << r.origin.z << ")  "
-						<< "direction: (" << r.direction.x << ", " << r.direction.y << ", " << r.direction.z << ")" << endl;
-				}
-
-				//Facet tri = data.at(l);
-				Facet tri = test_triangle;
-				
-				//Hitpoint hit = intersection(tri, r);
-				Hitpoint hit = intersection(test_triangle, r, cam);
-				
-				if (hit.has_hit == true){					
-					ppm_file << modelColor.r << ' ' << modelColor.g << ' ' << modelColor.b << endl;
-					//cout << "Hit at: " << hit.position.x << ' ' << hit.position.y << ' ' << hit.position.z << endl;
+			
+			Hitpoint hit;
+			Ray r = cam.get_ray(j, i);
+			
+			float shortest_distance = numeric_limits<float>::max();
+			
+			for (int l = 0; l < int(data.size()); l++){
+				Hitpoint triangleHit;
+			
+				triangleHit = intersection(data.at(l), r);
+				if (triangleHit.hit_reason == 3){
+					//float dist = triangleHit.calculate_distance(r.origin);
+					float dist = triangleHit.hit_point;
 					hitCounter++;
-					switch (hit.hit_reason){
-						case 0:
-							hitReason0++;
-							break;
-						case 1:
-							hitReason1++;
-							break;
-						case 2:
-							hitReason2++;
-							break;
-						case 3:
-							hitReason3++;
-							break;
-						case 4:
-							hitReason4++;
-							break;
-						default:
-							break;
-					}
-					
-					continue;
-				}
-				else {
-					ppm_file << backgroundColor.r << ' ' << backgroundColor.g << ' ' << backgroundColor.b << endl;
-					
-					switch (hit.hit_reason){
-						case 0:
-							hitReason0++;
-							break;
-						case 1:
-							hitReason1++;
-							break;
-						case 2:
-							hitReason2++;
-							break;
-						case 3:
-							hitReason3++;
-							break;
-						case 4:
-							hitReason4++;
-							break;
-						default:
-							break;
+				
+					if (dist < shortest_distance && dist > 0.0f){
+						shortest_distance = dist;
+						hit = triangleHit;
 					}
 				}
-			//}
+				
+				switch (triangleHit.hit_reason){
+					case 0:
+						hitReason0++;
+						break;
+					case 1:
+						hitReason1++;
+						break;
+					case 2:
+						hitReason2++;
+						break;
+					case 3:
+						hitReason3++;
+						break;
+					case 4:
+						hitReason4++;
+						break;
+					default:
+						break;
+				}
+			}
+			
+			ppm_file << hit.hit_color.r << ' ' << hit.hit_color.g << ' ' << hit.hit_color.b << endl;
 		}
 	}
 	
@@ -207,7 +175,7 @@ void createPPM(Camera cam, Model model){
 int main() {
 	cout << "Starting Programm" << endl;
 	
-	Model testmodel;
+	Model model;
 	Camera camera;
 	
 	cout << "Enter Camera Position X: ";
@@ -223,7 +191,7 @@ int main() {
 	cout << "Enter Camera View Z: ";
 	cin >> camera.cameraView.z;
 	
-	createPPM(camera, testmodel);
+	createPPM(camera, model);
 	
 	system("pause");
 	

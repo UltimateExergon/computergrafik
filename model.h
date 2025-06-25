@@ -6,18 +6,22 @@
 
 using namespace std;
 
+struct Color {
+	int r, g, b;
+};
+
 struct Facet {
 	Vector3D normal; // Flächennormale
 	vector<Vector3D> vertices; // Eckpunkte Dreieck
+	Color vertexColor = {255, 255, 255}; //Default weiß
 };
 
 class Model {
 	public:
-		Model(); //Constructor (empty atm)
-		vector<Facet> loadModel(string file_name);
-	private:
-		// speichert Liste von Facets in einem Vektor
 		vector<Facet> modelData;
+	
+		Model();
+		vector<Facet> loadModel(string file_name, string colorFile_name);
 };
 
 #endif
