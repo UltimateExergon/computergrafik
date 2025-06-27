@@ -22,9 +22,9 @@ Hitpoint intersection(Facet triangle, Ray r){
     edge1.set_vector(vector_subtraction(triangle.vertices[1], triangle.vertices[0]));
     edge2.set_vector(vector_subtraction(triangle.vertices[2], triangle.vertices[0]));
 
-    c.set_vector(vector_cross(edge2, r.direction));
+    c.set_vector(vector_cross(r.direction, edge2));
 
-    float det = vector_dot(edge1, r.direction);
+    float det = vector_dot(edge1, c);
     
 	constexpr float epsilon = numeric_limits<float>::epsilon();
 	
@@ -39,7 +39,8 @@ Hitpoint intersection(Facet triangle, Ray r){
 
     float u = vector_dot(s, c) * inv_det;
 
-    if ((u < 0.0f && fabsf(u) > epsilon) || (u > 1.0f && fabsf(u - 1) > epsilon)) {
+    //if ((u < 0.0f && fabsf(u) > epsilon) || (u > 1.0f && fabsf(u - 1) > epsilon)) {
+    if (u < 0.0f || u > 1.0f) {
         hit.hit_reason = 1;
         return hit;
     }
@@ -48,7 +49,8 @@ Hitpoint intersection(Facet triangle, Ray r){
 
     float v = vector_dot(q, r.direction) * inv_det;
 
-    if ((v < 0.0f && fabsf(v) > epsilon) || (u + v > 1.0f && fabsf(u + v - 1) > epsilon)) {
+    //if ((v < 0.0f && fabsf(v) > epsilon) || (u + v > 1.0f && fabsf(u + v - 1) > epsilon)) {
+    if (v < 0.0f || u + v > 1.0f) {
         hit.hit_reason = 2;
         return hit;
     }
@@ -73,6 +75,16 @@ Hitpoint intersection(Facet triangle, Ray r){
 //Creates a PPM output file
 void createPPM(Camera cam, Model model){
 	vector<Facet> data = model.loadModel("model_cube.stl", "colors.txt");
+	
+	//DEBUG ---------------------------------------------------------------------------------------------------------------------
+	//for (int u = 0; u < int(data.size()); u++){
+	//	Facet f = data.at(u);
+	//	for (int w = 0; w < int(f.vertices.size()); w++){
+	//		Vector3D vertex = f.vertices.at(w);
+	//		cout << "Facet " << u << " - Vertex " << w << ": " << vertex.x << ' ' << vertex.y << ' ' << vertex.z << endl;
+	//	}
+	//}
+	//--------------------------------------------------------------------------------------------------------------------------
 	
 	//TEST TRIANGLE----------------------
 	//Facet test_triangle;
