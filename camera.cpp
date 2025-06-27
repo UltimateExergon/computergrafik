@@ -72,6 +72,7 @@ Ray::Ray(Vector3D orig, Vector3D dir) : origin(orig), direction(dir) {}
 Hitpoint::Hitpoint(){
 	distance = numeric_limits<float>::max();
 	hit_color = {50, 50, 50}; //default Hintergrund;
+	has_hit = false;
 };
 
 float Hitpoint::calculate_distance(Vector3D v2){

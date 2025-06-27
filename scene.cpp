@@ -6,13 +6,12 @@
 #include "model.h"
 #include "camera.h"
 #include "vector3d.h"
+#include "light.h"
 
 using namespace std;
 
 Hitpoint intersection(Facet triangle, Ray r){
-	//print_facet(triangle, "FACET INTERSECT: ");
-    //Möller-Trumbore Intersection Algorithm
-	Hitpoint hit;
+    Hitpoint hit;
     Vector3D edge1;
     Vector3D edge2;
     Vector3D c;
@@ -29,7 +28,6 @@ Hitpoint intersection(Facet triangle, Ray r){
 	constexpr float epsilon = numeric_limits<float>::epsilon();
 	
 	 if (det > -epsilon && det < epsilon) {
-        hit.hit_reason = 0;
         return hit; //Ray parallel to triangle or triangle is back-facing
     }
 
@@ -39,9 +37,7 @@ Hitpoint intersection(Facet triangle, Ray r){
 
     float u = vector_dot(s, c) * inv_det;
 
-    //if ((u < 0.0f && fabsf(u) > epsilon) || (u > 1.0f && fabsf(u - 1) > epsilon)) {
     if (u < 0.0f || u > 1.0f) {
-        hit.hit_reason = 1;
         return hit;
     }
 
@@ -49,9 +45,7 @@ Hitpoint intersection(Facet triangle, Ray r){
 
     float v = vector_dot(q, r.direction) * inv_det;
 
-    //if ((v < 0.0f && fabsf(v) > epsilon) || (u + v > 1.0f && fabsf(u + v - 1) > epsilon)) {
     if (v < 0.0f || u + v > 1.0f) {
-        hit.hit_reason = 2;
         return hit;
     }
 
@@ -59,13 +53,12 @@ Hitpoint intersection(Facet triangle, Ray r){
 
     if (t > epsilon) {
 		hit.position = vector_addition(r.origin, vector_times_float(r.direction, t));
-		hit.hit_reason = 3;
+		hit.has_hit = true;
 		hit.hit_color = triangle.vertexColor;
 		hit.hit_point = t;
 		return hit;
 	}
 	else {	
-		hit.hit_reason = 4;
 		return hit;
 	}
 }
@@ -73,40 +66,8 @@ Hitpoint intersection(Facet triangle, Ray r){
 
 
 //Creates a PPM output file
-void createPPM(Camera cam, Model model){
+void createPPM(Camera cam, Model model, Light light){
 	vector<Facet> data = model.loadModel("model_cube.stl", "colors.txt");
-	
-	//DEBUG ---------------------------------------------------------------------------------------------------------------------
-	//for (int u = 0; u < int(data.size()); u++){
-	//	Facet f = data.at(u);
-	//	for (int w = 0; w < int(f.vertices.size()); w++){
-	//		Vector3D vertex = f.vertices.at(w);
-	//		cout << "Facet " << u << " - Vertex " << w << ": " << vertex.x << ' ' << vertex.y << ' ' << vertex.z << endl;
-	//	}
-	//}
-	//--------------------------------------------------------------------------------------------------------------------------
-	
-	//TEST TRIANGLE----------------------
-	//Facet test_triangle;
-	
-	//Vector3D p1;
-	//p1.set_values(0, 0, 0);
-	//Vector3D p2;
-	//p2.set_values(3, 0, 0);
-	//Vector3D p3;
-	//p3.set_values(0, 3, 3); // jetzt ist es schief im Raum
-	
-	//Vector3D n;
-	//n.set_values(0, -1, 0); // zeigt nun nach unten zur Kamera hin
-	//test_triangle.normal = n;
-	
-	
-	//test_triangle.vertices.push_back(p1);
-	//test_triangle.vertices.push_back(p3);
-	//test_triangle.vertices.push_back(p2);
-
-	
-	//------------------------------------
 	
 	int maxColors = 255;
 	
@@ -117,13 +78,8 @@ void createPPM(Camera cam, Model model){
 	ppm_file << cam.get_imageWidth() << ' ' << cam.get_imageHeight() << endl;
 	ppm_file << maxColors << endl;
 	
-	//Counts the breaking points of intersect()
+	//Counts the hits
 	int hitCounter = 0;
-	int hitReason0 = 0;
-	int hitReason1 = 0;
-	int hitReason2 = 0;
-	int hitReason3 = 0;
-	int hitReason4 = 0;
 	
 	//Add model data to ppm
 	for (int i = 0; i < cam.get_imageHeight(); i++){
@@ -138,8 +94,7 @@ void createPPM(Camera cam, Model model){
 				Hitpoint triangleHit;
 			
 				triangleHit = intersection(data.at(l), r);
-				if (triangleHit.hit_reason == 3){
-					//float dist = triangleHit.calculate_distance(r.origin);
+				if (triangleHit.has_hit == true){
 					float dist = triangleHit.hit_point;
 					hitCounter++;
 				
@@ -147,26 +102,6 @@ void createPPM(Camera cam, Model model){
 						shortest_distance = dist;
 						hit = triangleHit;
 					}
-				}
-				
-				switch (triangleHit.hit_reason){
-					case 0:
-						hitReason0++;
-						break;
-					case 1:
-						hitReason1++;
-						break;
-					case 2:
-						hitReason2++;
-						break;
-					case 3:
-						hitReason3++;
-						break;
-					case 4:
-						hitReason4++;
-						break;
-					default:
-						break;
 				}
 			}
 			
@@ -177,18 +112,15 @@ void createPPM(Camera cam, Model model){
 	ppm_file.close();
 	
 	cout << "Output File created with " << hitCounter << " hits!" << endl;
-	cout << "Parallel Rays: " << hitReason0 << endl;
-	cout << "u < 0.0 || u > 1.0 -> " << hitReason1 << endl;
-	cout << "b < 0.0 || u + b > 1.0 -> " << hitReason2 << endl;
-	cout << "t > epsilon -> Hits -> " << hitReason3 << endl;
-	cout << "t <= epsilon -> " << hitReason4 << endl;
 }
+
 
 int main() {
 	cout << "Starting Programm" << endl;
 	
 	Model model;
 	Camera camera;
+	Light light;
 	
 	cout << "Enter Camera Position X: ";
 	cin >> camera.cameraPos.x;
@@ -203,7 +135,7 @@ int main() {
 	cout << "Enter Camera View Z: ";
 	cin >> camera.cameraView.z;
 	
-	createPPM(camera, model);
+	createPPM(camera, model, light);
 	
 	system("pause");
 	

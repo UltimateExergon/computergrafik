@@ -24,7 +24,7 @@ class Hitpoint{
 	public:
 		Vector3D position;
 		float distance;
-		int hit_reason;
+		bool has_hit;
 		Color hit_color;
 		float hit_point;
 		

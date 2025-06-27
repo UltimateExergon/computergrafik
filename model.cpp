@@ -16,7 +16,6 @@ vector<Facet> Model::loadModel(string file_name, string colorFile_name) {
 			
 	if (file.is_open()) {
 		string line;
-		//Facet facet;
 		int vertexCount = 0; // damit wird gezählt, wie viele "vertex"-Zeilen es waren, weil Dreiecke brauchen genau 3 Seiten (=Zeile)		
 		
 		while (getline(file, line)) {
