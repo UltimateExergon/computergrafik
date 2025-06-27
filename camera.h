@@ -7,10 +7,6 @@
 
 using namespace std;
 
-struct Pos2D {
-	float x, y;
-};
-
 class Ray {
 	public:
 		Vector3D origin;
@@ -22,11 +18,11 @@ class Ray {
 
 class Hitpoint{
 	public:
-		Vector3D position;
-		float distance;
+		Vector3D position; //Cartesian Coordinates of the Point
+		float distance; 
 		bool has_hit;
 		Color hit_color;
-		float hit_point;
+		int facet_index;
 		
 		Hitpoint();
 		float calculate_distance(Vector3D v2);

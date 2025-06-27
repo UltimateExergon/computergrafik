@@ -26,13 +26,24 @@ Vector3D vector_addition(Vector3D v1, Vector3D v2) {
 	return v3;
 }
 
-//Returns Subtraction of two Vertex
+//Returns Subtraction of two Vectors
 Vector3D vector_subtraction(Vector3D v1, Vector3D v2) {
 	Vector3D v3;
 	
 	v3.x = v1.x - v2.x;
 	v3.y = v1.y - v2.y;
 	v3.z = v1.z - v2.z;
+	
+	return v3;
+}
+
+//Returns Multiplication of two Vectors
+Vector3D vector_multiplication(Vector3D v1, Vector3D v2){
+	Vector3D v3;
+	
+	v3.x = v1.x * v2.x;
+	v3.y = v1.y * v2.y;
+	v3.z = v1.z * v2.z;
 	
 	return v3;
 }
@@ -71,4 +82,11 @@ Vector3D normalize(Vector3D v1) {
     v1.y /= length;
     v1.z /= length;
     return v1;
+}
+
+Vector3D barycentric_to_cartesian(Vector3D b, Vector3D v1, Vector3D v2, Vector3D v3){
+	Vector3D bx = vector_times_float(v1, b.x);
+	Vector3D by = vector_times_float(v2, b.y);
+	Vector3D bz = vector_times_float(v3, b.z);
+	return vector_addition(bx, vector_addition(by, bz));
 }

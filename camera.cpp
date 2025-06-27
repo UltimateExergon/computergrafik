@@ -63,8 +63,7 @@ Ray Camera::get_ray(int x, int y) {
     return Ray(cameraPos, dir);
 }
 
-Ray::Ray(){
-}
+Ray::Ray(){}
 
 
 Ray::Ray(Vector3D orig, Vector3D dir) : origin(orig), direction(dir) {}
