@@ -4,9 +4,9 @@
 using namespace std;
 
 Light::Light(){
-	specular_const = 2.0f;
-	diffuse_const = 2.0f;
+	specular_const = 0.1f;
+	diffuse_const = 0.4f;
 	ambient_const = 2.0f;
-	shininess = 1.0f;
+	shininess = 0.1f;
 	
 };
