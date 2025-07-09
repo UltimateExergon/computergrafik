@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "vector3d.h"
 #include "light.h"
+#include "cube.h"
 
 using namespace std;
 
@@ -71,7 +72,11 @@ Hitpoint intersection(Facet triangle, Ray r){
 
 //Creates a PPM output file
 void createPPM(Camera cam, Model model, Light light){
-	vector<Facet> data = model.loadModel("model_cube.stl", "colors.txt");
+	auto triangles = model.loadModel("model_cube.stl", "colors.txt");
+	
+	UniformGrid grid(triangles, 20, 20, 20);
+	grid.build(triangles);
+
 	
 	int maxColors = 255;
 	
@@ -88,31 +93,26 @@ void createPPM(Camera cam, Model model, Light light){
 	//Add model data to ppm
 	for (int i = 0; i < cam.get_imageHeight(); i++){
 		for (int j = 0; j < cam.get_imageWidth(); j++){
-			
-			Hitpoint hit;
 			Ray r = cam.get_ray(j, i);
-			
-			float shortest_distance = numeric_limits<float>::max();
-			
-			for (int l = 0; l < int(data.size()); l++){
-				Hitpoint triangleHit;
-			
-				triangleHit = intersection(data.at(l), r);
-				if (triangleHit.has_hit == true){
-					triangleHit.facet_index = l;
-					hitCounter++;
-				
-					if (triangleHit.distance < shortest_distance && triangleHit.distance > 0.0f){
-						shortest_distance = triangleHit.distance;
-						hit = triangleHit;
-					}
-				}
-			}
+
+            std::vector<int> candidates = grid.traverse(r);
+
+            Hitpoint hit;
+            float bestT = numeric_limits<float>::max();
+            for (int tid : candidates) {
+                Hitpoint triangleHit = intersection(triangles[tid], r);
+                if (triangleHit.has_hit && triangleHit.distance < bestT) {
+                    bestT = triangleHit.distance;
+                    hit = triangleHit;
+                    hit.facet_index = tid;
+                }
+            }
+
 			
 			//Calculate Lighting
 			Color lighted_color = hit.hit_color;
 			if (hit.has_hit == true){
-				Vector3D face_normal = data.at(hit.facet_index).normal;
+				Vector3D face_normal = triangles.at(hit.facet_index).normal;
 				Vector3D hit_to_light = vector_subtraction(light.light_pos, hit.position);
 				Vector3D hit_to_cam = vector_subtraction(r.origin, hit.position);
 				Vector3D reflection = vector_subtraction(vector_multiplication(vector_times_float(vector_dot(hit_to_light, face_normal), 2), face_normal), hit_to_light);
