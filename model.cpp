@@ -45,21 +45,6 @@ vector<Facet> Model::loadModel(string file_name, string colorFile_name) {
 		file.close();
 	}
 	
-	ifstream c_file(colorFile_name);
-	
-	if (c_file.is_open()){
-		string c_line;
-		int lineCount = 0;
-		
-		while (getline(c_file, c_line)){
-			istringstream issc(c_line);
-			issc >> modelData[lineCount].vertexColor.r >> modelData[lineCount].vertexColor.g >> modelData[lineCount].vertexColor.b;
-			lineCount++;
-		}
-		
-		c_file.close();
-	}
-	
 	cout << "Geladene Facetten: " << modelData.size() << endl;
 	
 	return modelData;

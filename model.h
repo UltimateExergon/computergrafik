@@ -21,7 +21,7 @@ class Model {
 		vector<Facet> modelData;
 	
 		Model();
-		vector<Facet> loadModel(string file_name, string colorFile_name);
+		vector<Facet> loadModel(string file_name);
 };
 
 #endif

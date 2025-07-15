@@ -19,6 +19,7 @@ class Ray {
 class Hitpoint{
 	public:
 		Vector3D position; //Cartesian Coordinates of the Point
+		Vector3D baryPos; //Barycentric coordinates of the point
 		float distance; 
 		bool has_hit;
 		Color hit_color;
