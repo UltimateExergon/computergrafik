@@ -58,7 +58,11 @@ struct BMP {
 #pragma pack(pop)  // Restore previous packing alignment
 
 
-void loadBMP(const std::string& filename) {
+BMP loadBMP(const std::string& filename) {
+
+	BMP result;
+	BMPHeader bmpHeader;
+    DIBHeader dibHeader;
 
     std::ifstream file(filename, std::ios::binary);
 
@@ -68,15 +72,9 @@ void loadBMP(const std::string& filename) {
 
         std::cerr << "Error opening file: " << filename << std::endl;
 
-        return;
+        return result;
 
     }
-
-    
-
-    BMPHeader bmpHeader;
-
-    DIBHeader dibHeader;
 
     
 
@@ -88,7 +86,7 @@ void loadBMP(const std::string& filename) {
 
         std::cerr << "Not a valid BMP file" << std::endl;
 
-        return;
+        return result;
 
     }
 
@@ -106,7 +104,7 @@ void loadBMP(const std::string& filename) {
 
         std::cerr << "Only 24-bit BMP files are supported." << std::endl;
 
-        return;
+        return result;
 
     }
 
@@ -128,7 +126,7 @@ void loadBMP(const std::string& filename) {
 
         for (int x = 0; x < dibHeader.width; ++x) {
 
-            file.read(reinterpret_cast<char*>(&pixels[y * dibHeader.width + x]), sizeof(RGBPixel));
+            file.read(reinterpret_cast<char*>(&pixels[y * dibHeader.width + x]), sizeof(Color));
 
         }
 
@@ -144,19 +142,23 @@ void loadBMP(const std::string& filename) {
 
     //    for (int x = 0; x < 10 && x < dibHeader.width; ++x) {  // Limit to first 10 columns
 
-    //        RGBPixel& pixel = pixels[y * dibHeader.width + x];
+    //        Color& pixel = pixels[y * dibHeader.width + x];
 
-    //        std::cout << "Pixel at (" << x << "," << y << ") - R: " << (int)pixel.red
+    //        std::cout << "Pixel at (" << x << "," << y << ") - R: " << (int)pixel.r
 
-    //                  << " G: " << (int)pixel.green << " B: " << (int)pixel.blue << std::endl;
+    //                  << " G: " << (int)pixel.g << " B: " << (int)pixel.b << std::endl;
 
     //    }
 
     //}
 
-
     file.close();
-
+    
+	result.Bheader = bmpHeader;
+	result.Dheader = dibHeader;
+	result.pixels = pixels;
+	
+	return result;
 }
 
 Color getPixel(BMP bmpdata, int x, int y){

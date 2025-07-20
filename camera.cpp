@@ -9,8 +9,8 @@ using namespace std;
 Camera::Camera() {
     screenWidth = 4.0f;
     screenHeight = 4.0f;
-    imageWidth = 400; 
-    imageHeight = 300;
+    imageWidth = 1400; 
+    imageHeight = 1300;
     
 	offsetX = 0.0f;
 	offsetY = 0.0f;

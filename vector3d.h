@@ -1,8 +1,9 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
-struct Vector2D {
-	int x, y;
+//Just putting this here cause why make a new file just for this one struct
+struct Vector2D{
+	float x, y;
 };
 
 class Vector3D {
@@ -23,8 +24,5 @@ Vector3D vector_times_float(Vector3D v1, float f);
 Vector3D vector_cross(Vector3D v1, Vector3D v2);
 Vector3D normalize(Vector3D v);
 Vector3D barycentric_to_cartesian(Vector3D b, Vector3D v1, Vector3D v2, Vector3D v3);
-
-float length2D(Vector2D v);
-Vector2D vector_subtraction2D(Vector2D v1, Vector2D v2);
 
 #endif

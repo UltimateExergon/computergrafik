@@ -90,16 +90,3 @@ Vector3D barycentric_to_cartesian(Vector3D b, Vector3D v1, Vector3D v2, Vector3D
 	Vector3D bz = vector_times_float(v3, b.z);
 	return vector_addition(bx, vector_addition(by, bz));
 }
-
-float length2D(Vector2D v) {
-	return sqrt(pow(v.x, 2) + pow(v.y, 2));
-}
-
-Vector2D vector_subtraction2D(Vector2D v1, Vector2D v2) {
-	Vector3D v3;
-	
-	v3.x = v1.x - v2.x;
-	v3.y = v1.y - v2.y;
-	
-	return v3;
-}
