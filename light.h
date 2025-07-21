@@ -9,6 +9,7 @@ class Light {
 		float diffuse_const;
 		float ambient_const;
 		float shininess;
+		Color light_color;
 		
 		Light();
 };

@@ -2,7 +2,6 @@
 #define CAMERA_H
 #include <vector>
 #include <limits>
-#include "model.h"
 #include "vector3d.h"
 
 using namespace std;
@@ -23,7 +22,7 @@ class Hitpoint{
 		float distance; 
 		bool has_hit;
 		Color hit_color;
-		int facet_index;
+		unsigned int facet_index;
 		
 		Hitpoint();
 		float calculate_distance(Vector3D v2);
@@ -38,15 +37,15 @@ public:
     float screenWidth;  
     float screenHeight;
 
-    int imageWidth; // jetzt im Konstruktor initialisiert
-    int imageHeight; // jetzt im Konstruktor initialisiert
+    unsigned int imageWidth; // jetzt im Konstruktor initialisiert
+    unsigned int imageHeight; // jetzt im Konstruktor initialisiert
     
 	float offsetX;
 	float offsetY;
 
     Camera();
-    int get_imageHeight();
-    int get_imageWidth();
+    unsigned int get_imageHeight();
+    unsigned int get_imageWidth();
 	// wandelt Pixelkoordinaten in Weltkoordinaten um
     Vector3D get_pixel(int x, int y);
     Ray get_ray(int x, int y);

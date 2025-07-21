@@ -1,5 +1,11 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
+#include "stdint.h"
+
+//Putting this here so we don't have to include model.h everywhere
+struct Color {
+	uint8_t b, g, r; //Swapped r and b, because apparently for some reason the color values are in this order in the BMP file
+};
 
 //Just putting this here cause why make a new file just for this one struct
 struct Vector2D{

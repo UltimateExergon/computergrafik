@@ -4,6 +4,8 @@
 #include <limits>
 #include <math.h>
 #include <cmath>
+#include <algorithm>
+
 #include "model.h"
 #include "camera.h"
 #include "vector3d.h"
@@ -61,7 +63,6 @@ Hitpoint intersection(Facet triangle, Ray r){
 		hit.position.set_vector(barycentric_to_cartesian(barycentric, triangle.vertices[0], triangle.vertices[1], triangle.vertices[2]));
 		
 		hit.has_hit = true;
-		hit.hit_color = triangle.vertexColor;
 		hit.distance = t;
 		return hit;
 	}
@@ -71,23 +72,29 @@ Hitpoint intersection(Facet triangle, Ray r){
 }
 
 Color mapTexture(BMP texture, Hitpoint hit, Facet triangle){
-	
 	float u = hit.baryPos.x * triangle.uv[0].x + hit.baryPos.y * triangle.uv[1].x + hit.baryPos.z * triangle.uv[2].x;
 	float v = hit.baryPos.x * triangle.uv[0].y + hit.baryPos.y * triangle.uv[1].y + hit.baryPos.z * triangle.uv[2].y;
 	
 	u *= texture.Dheader.width;
 	v *= texture.Dheader.height;
 	
-	u = min(max(u, 0.0f), float(texture.Dheader.width - 1));
-	v = min(max(v, 0.0f), float(texture.Dheader.height - 1));
+	u = clamp(u, 0.0f, float(texture.Dheader.width));
+	v = clamp(v, 0.0f, float(texture.Dheader.height));
 
 	return texture.pixels.at(int(v) * texture.Dheader.width + int(u));
 }
 
+//Helper function to ensure proper color values
+uint8_t clampColor(float c){
+	uint8_t new_c = clamp(int(c), 0, 255);
+	return new_c;
+}
+
 //Creates a PPM output file
-void createPPM(Camera cam, Model model, Light light, BMP texture){
-	auto triangles = model.loadModel("model_cube.stl", "uv.txt");
-	texture = loadBMP("texture.bmp");
+void createPPM(Camera cam, Light light){
+	Model model;
+	auto triangles = model.loadModel("model.stl", "uv.txt");
+	BMP texture = loadBMP("texture.bmp");
 	
 	UniformGrid grid(triangles, 20, 20, 20);
 	grid.build(triangles);
@@ -103,55 +110,67 @@ void createPPM(Camera cam, Model model, Light light, BMP texture){
 	ppm_file << maxColors << endl;
 	
 	//Add model data to ppm
-	for (int i = 0; i < cam.get_imageHeight(); i++){
-		for (int j = 0; j < cam.get_imageWidth(); j++){
+	for (unsigned int i = 0; i < cam.get_imageHeight(); i++){
+		for (unsigned int j = 0; j < cam.get_imageWidth(); j++){
 			Ray r = cam.get_ray(j, i);
 
-            std::vector<int> candidates = grid.traverse(r);
+            vector<int> candidates = grid.traverse(r);
 
             Hitpoint hit;
             float bestT = numeric_limits<float>::max();
+            
             for (int tid : candidates) {
                 Hitpoint triangleHit = intersection(triangles[tid], r);
                 if (triangleHit.has_hit && triangleHit.distance < bestT) {
                     bestT = triangleHit.distance;
                     hit = triangleHit;
                     hit.facet_index = tid;
-                    hit.hit_color = mapTexture(texture, hit, triangles[tid]);
                 }
             }
-
 			
 			//Calculate Lighting
-			Color lighted_color = hit.hit_color;
-			if (hit.has_hit == true){
+			Color lighted_color = {1, 1, 1};
+			
+			if (hit.has_hit == true) {
+				hit.hit_color = mapTexture(texture, hit, triangles.at(hit.facet_index));
+				
 				Vector3D face_normal = triangles.at(hit.facet_index).normal;
-				Vector3D hit_to_light = vector_subtraction(light.light_pos, hit.position);
-				Vector3D hit_to_cam = vector_subtraction(r.origin, hit.position);
-				Vector3D reflection = vector_subtraction(vector_multiplication(vector_times_float(vector_dot(hit_to_light, face_normal), 2), face_normal), hit_to_light);
-			
+				Vector3D hit_to_light = normalize(vector_subtraction(light.light_pos, hit.position));
+				Vector3D hit_to_cam = normalize(vector_subtraction(r.origin, hit.position));
+				Vector3D reflection = normalize(vector_subtraction(vector_multiplication(vector_times_float(vector_dot(hit_to_light, face_normal), 2), face_normal), hit_to_light));
+				
 				//Ambient
-				lighted_color.r += uint8_t(light.ambient_const);
-				lighted_color.g += uint8_t(light.ambient_const);
-				lighted_color.b += uint8_t(light.ambient_const);
-			
+				lighted_color.r = clampColor(lighted_color.r + light.light_color.r * light.ambient_const);
+				lighted_color.g = clampColor(lighted_color.g + light.light_color.g * light.ambient_const);
+				lighted_color.b = clampColor(lighted_color.b + light.light_color.b * light.ambient_const);
+				
 				//Diffuse
-				lighted_color.r += uint8_t(light.diffuse_const * vector_dot(face_normal, hit_to_light));
-				lighted_color.g += uint8_t(light.diffuse_const * vector_dot(face_normal, hit_to_light));
-				lighted_color.b += uint8_t(light.diffuse_const * vector_dot(face_normal, hit_to_light));
-			
+				float diffuseFactor = vector_dot(face_normal, hit_to_light);
+				if (diffuseFactor > 0.0f){
+					float diffuse = light.diffuse_const * diffuseFactor;
+					
+					lighted_color.r = clampColor(lighted_color.r + light.light_color.r * diffuse);
+					lighted_color.g = clampColor(lighted_color.g + light.light_color.g * diffuse);
+					lighted_color.b = clampColor(lighted_color.b + light.light_color.b * diffuse);
+				}
+				
 				//Specular
-				lighted_color.r += uint8_t(light.specular_const * pow(vector_dot(reflection, hit_to_cam), light.shininess));
-				lighted_color.g += uint8_t(light.specular_const * pow(vector_dot(reflection, hit_to_cam), light.shininess));
-				lighted_color.b += uint8_t(light.specular_const * pow(vector_dot(reflection, hit_to_cam), light.shininess));
-			}
-			else{
-				lighted_color.r += uint8_t(light.ambient_const);
-				lighted_color.g += uint8_t(light.ambient_const);
-				lighted_color.b += uint8_t(light.ambient_const);
+				float specularFactor = clamp(vector_dot(reflection, hit_to_cam), 0.0f, 1.0f);
+				if (specularFactor > 0.0f){
+					float specular = light.specular_const * pow(specularFactor, light.shininess);
+					
+					lighted_color.r = clampColor(lighted_color.r + light.light_color.r * specular);
+					lighted_color.g = clampColor(lighted_color.g + light.light_color.g * specular);
+					lighted_color.b = clampColor(lighted_color.b + light.light_color.b * specular);
+				}
 			}
 			
-			ppm_file << lighted_color.r << ' ' << lighted_color.g << ' ' << lighted_color.b << endl;
+			//Final Color
+			hit.hit_color.r = clampColor(hit.hit_color.r + lighted_color.r);
+			hit.hit_color.g = clampColor(hit.hit_color.g + lighted_color.g);
+			hit.hit_color.b = clampColor(hit.hit_color.b + lighted_color.b);
+			
+			ppm_file << hit.hit_color.r << ' ' <<  hit.hit_color.g << ' ' <<  hit.hit_color.b << endl;
 		}
 	}
 	
@@ -165,10 +184,8 @@ int main() {
 	cout << "Starting Programm" << endl;
 	cout << "Program made by Judith <insert last name> and Julian Wolf" << endl;
 	
-	Model model;
 	Camera camera;
 	Light light;
-	BMP texture;
 	
 	cout << "Enter Camera Position X: ";
 	cin >> camera.cameraPos.x;
@@ -189,7 +206,7 @@ int main() {
 	cout << "Enter Light Position Z: ";
 	cin >> light.light_pos.z;
 	
-	createPPM(camera, model, light, texture);
+	createPPM(camera, light);
 	
 	system("pause");
 	

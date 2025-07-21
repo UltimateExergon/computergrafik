@@ -1,7 +1,10 @@
+#ifndef BMP_H
+#define BMP_H
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "model.h"
+#include "vector3d.h"
+#include "stdint.h"
 
 
 #pragma pack(push, 1)  // Ensure that structure members are not padded
@@ -132,31 +135,13 @@ BMP loadBMP(const std::string& filename) {
 
     }
 
-    
-
-    // Now we have the pixel data in the `pixels` array.
-
-    // Let's print out some pixel values (RGB)
-
-    //for (int y = 0; y < 10 && y < dibHeader.height; ++y) {  // Limit to first 10 rows
-
-    //    for (int x = 0; x < 10 && x < dibHeader.width; ++x) {  // Limit to first 10 columns
-
-    //        Color& pixel = pixels[y * dibHeader.width + x];
-
-    //        std::cout << "Pixel at (" << x << "," << y << ") - R: " << (int)pixel.r
-
-    //                  << " G: " << (int)pixel.g << " B: " << (int)pixel.b << std::endl;
-
-    //    }
-
-    //}
-
     file.close();
     
 	result.Bheader = bmpHeader;
 	result.Dheader = dibHeader;
 	result.pixels = pixels;
+	
+	cout << "Texture loaded successfully!" << endl;
 	
 	return result;
 }
@@ -164,3 +149,5 @@ BMP loadBMP(const std::string& filename) {
 Color getPixel(BMP bmpdata, int x, int y){
 	return bmpdata.pixels.at(y * bmpdata.Dheader.width + x);
 }
+
+#endif

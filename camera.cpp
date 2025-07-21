@@ -17,11 +17,11 @@ Camera::Camera() {
 }
 
 
-int Camera::get_imageWidth(){
+unsigned int Camera::get_imageWidth(){
 	return imageWidth;
 }
 
-int Camera::get_imageHeight(){
+unsigned int Camera::get_imageHeight(){
 	return imageHeight;
 }
 
@@ -70,7 +70,7 @@ Ray::Ray(Vector3D orig, Vector3D dir) : origin(orig), direction(dir) {}
 
 Hitpoint::Hitpoint(){
 	distance = numeric_limits<float>::max();
-	hit_color = {50, 50, 50}; //default Hintergrund;
+	hit_color = {177, 127, 77};
 	has_hit = false;
 };
 
