@@ -182,7 +182,7 @@ void createPPM(Camera cam, Light light){
 
 int main() {
 	cout << "Starting Programm" << endl;
-	cout << "Program made by Judith <insert last name> and Julian Wolf" << endl;
+	cout << "Program made by Judith Schmiedchen and Julian Wolf" << endl;
 	
 	Camera camera;
 	Light light;
